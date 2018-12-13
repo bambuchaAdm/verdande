@@ -1,26 +1,33 @@
 package org.verdande.core
 
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
 
-class CollectorRegistry() {
-  def register(collector: Collector): Any = ???
+trait Sample {
 
 }
 
-class Collector()
+class SampleSeries(samples: Seq[Sample]) extends Iterable[Sample] {
+  override def iterator: Iterator[Sample] = samples.iterator
+}
 
-class MetricRegistryTest extends FlatSpec {
+class Collector() {
+  def collect(): SampleSeries = ???
 
-  behavior of "Collector Registry"
+}
 
-  it should "register collector" in {
-    val registry = new CollectorRegistry()
+class CollectorTest extends FlatSpec with Matchers {
+
+  behavior of "Collector"
+
+  it should "returns zero or more metrics and their samples" in {
     val collector = new Collector()
-    registry.register(collector)
-
+    val result = collector.collect()
+    result shouldBe a[Iterable[Sample]]
   }
 
 }
+
+
 
 
 
