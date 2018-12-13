@@ -2,19 +2,6 @@ package org.verdande.core
 
 import org.scalatest.{FlatSpec, Matchers}
 
-trait Sample {
-
-}
-
-class SampleSeries(samples: Seq[Sample]) extends Iterable[Sample] {
-  override def iterator: Iterator[Sample] = samples.iterator
-}
-
-class Collector() {
-  def collect(): SampleSeries = new SampleSeries(Seq.empty)
-
-}
-
 class CollectorTest extends FlatSpec with Matchers {
 
   behavior of "Collector"
