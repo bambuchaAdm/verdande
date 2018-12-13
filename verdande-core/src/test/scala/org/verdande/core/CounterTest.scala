@@ -17,4 +17,11 @@ class CounterTest extends FlatSpec with Matchers {
     counter.inc(value)
     counter.value shouldEqual value
   }
+
+  it should "throw exception on negative increment" in {
+    val counter = Counter()
+    intercept[IllegalArgumentException] {
+      counter.inc(-1.0)
+    }
+  }
 }

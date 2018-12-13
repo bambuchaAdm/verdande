@@ -13,7 +13,12 @@ object Counter {
 
     override def inc(): Unit = buffer += 1
 
-    override def inc(value: Double): Unit = buffer += value
+    override def inc(value: Double): Unit = {
+      if (value < 0) {
+        throw new IllegalArgumentException("counter increase by negative value")
+      }
+      buffer += value
+    }
 
     override def value: Double = buffer
   }
