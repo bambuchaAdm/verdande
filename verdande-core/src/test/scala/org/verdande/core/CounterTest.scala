@@ -56,8 +56,7 @@ class CounterTest extends FlatSpec with Matchers {
       name = "example_counter",
       description = "Example counter without registring it anywhere for tests",
       labelsKeys = Seq("foo", "bar")
-    )
-    metric.register()
+    ).register()
     CollectorRegistry.default should contain (metric)
   }
 
@@ -67,8 +66,7 @@ class CounterTest extends FlatSpec with Matchers {
       name = "example_counter",
       description = "Example counter without registring it anywhere for tests",
       labelsKeys = Seq("foo", "bar")
-    )
-    metric.register()(other)
+    ).register()(other)
     other should contain (metric)
   }
 }

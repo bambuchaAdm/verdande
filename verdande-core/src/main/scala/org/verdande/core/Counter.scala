@@ -27,7 +27,7 @@ class CounterChild(val labelValues: List[String]) extends Counter {
 class CounterMetric(val name: String, val description: String, val labelsKeys: Seq[String])
   extends Counter with Metric with Collector with Labelable[Counter] {
 
-  private val children = new AtomicReference[Map[Labels, CounterChild]](Map.empty)
+  private val children = new AtomicReference[Map[LabelsValues, CounterChild]](Map.empty)
 
   private val noLabel = new CounterChild(List.empty)
 
@@ -36,7 +36,7 @@ class CounterMetric(val name: String, val description: String, val labelsKeys: S
   override def inc(value: Double): Unit = noLabel.inc(value)
 
   @tailrec
-  override final def labels(value: Labels): Counter = {
+  override final def labels(value: LabelsValues): Counter = {
     val map = children.get()
     map.get(value) match {
       case Some(counter) => counter
