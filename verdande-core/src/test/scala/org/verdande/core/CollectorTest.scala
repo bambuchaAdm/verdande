@@ -11,7 +11,7 @@ class SampleSeries(samples: Seq[Sample]) extends Iterable[Sample] {
 }
 
 class Collector() {
-  def collect(): SampleSeries = ???
+  def collect(): SampleSeries = new SampleSeries(Seq.empty)
 
 }
 
