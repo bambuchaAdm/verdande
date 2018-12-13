@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.annotation.tailrec
 import scala.collection.immutable.ListSet
 
-trait CollectorRegistry {
+trait CollectorRegistry extends Iterable[Collector] {
   def unregister(collector: Collector): CollectorRegistry
   def register(collector: Collector): CollectorRegistry
   def iterator: Iterator[Collector]
