@@ -10,10 +10,10 @@ class CollectorRegistryTest extends FlatSpec with Matchers {
 
     override def description: String = "Example metric for tests"
 
-    override def labelsNames: Seq[String] = Seq.empty
+    override def labelsKeys: Seq[String] = Seq.empty
 
     override def collect(): Sample = {
-      SimpleSample(this, Seq.empty)
+      Sample(this, Seq.empty)
     }
   }
 

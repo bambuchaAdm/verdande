@@ -4,13 +4,13 @@ case class Labels(values: List[String])
 
 object Labels {
   def apply(metric: Metric, labelsValue: String*): Labels = {
-    if(metric.labelsNames.length != labelsValue.length){
+    if(metric.labelsKeys.length != labelsValue.length){
       throw new IllegalArgumentException("Number of labels values must match to metric labels names")
     }
     Labels(labelsValue.toList)
   }
   def apply(metric: Metric, labels: Map[String, String]): Labels = {
-    apply(metric, metric.labelsNames.map(name => labels.getOrElse(name, "")): _*)
+    apply(metric, metric.labelsKeys.map(name => labels.getOrElse(name, "")): _*)
   }
 }
 

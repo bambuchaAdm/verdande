@@ -24,7 +24,7 @@ class CounterChild(val labelValues: List[String]) extends Counter {
   def value: Double = buffer.sum()
 }
 
-class CounterMetric(val name: String, val description: String, val labelsNames: Seq[String])
+class CounterMetric(val name: String, val description: String, val labelsKeys: Seq[String])
   extends Counter with Metric with Collector with Labelable[Counter] {
 
   private val children = new AtomicReference[Map[Labels, CounterChild]](Map.empty)
@@ -53,16 +53,11 @@ class CounterMetric(val name: String, val description: String, val labelsNames: 
 
   override def collect(): Sample = {
     val childSeries: List[Series] = children.get().map {
-      case (_, value) => SimpleSeries(value.labelValues, value.value)
+      case (_, value) => Series(value.labelValues, value.value)
     }(collection.breakOut)
-    val voidSeries = SimpleSeries(noLabel.labelValues, noLabel.value)
+    val voidSeries = Series(noLabel.labelValues, noLabel.value)
 
-    SimpleSample(this, voidSeries :: childSeries)
-  }
-
-  def register()(implicit registry: CollectorRegistry): CounterMetric = {
-    registry.register(this)
-    this
+    Sample(this, voidSeries :: childSeries)
   }
 }
 
