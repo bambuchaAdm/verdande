@@ -10,4 +10,11 @@ class CounterTest extends FlatSpec with Matchers {
     counter.inc()
     counter.value shouldEqual 1.0
   }
+
+  it should "allow to increment by more then one" in {
+    val value  = 10.0
+    val counter = Counter()
+    counter.inc(value)
+    counter.value shouldEqual value
+  }
 }
