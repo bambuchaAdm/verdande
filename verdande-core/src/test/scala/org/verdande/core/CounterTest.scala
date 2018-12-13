@@ -6,7 +6,10 @@ class CounterTest extends FlatSpec with Matchers {
   behavior of "Counter"
 
   trait ExampleCounter {
-    val counter = Counter()
+    val counter: CounterMetric = Counter.build(
+      name = "example_counter",
+      description = "Example counter without registring it anywhere for tests"
+    )
   }
 
   it should "start from zero" in new ExampleCounter {
