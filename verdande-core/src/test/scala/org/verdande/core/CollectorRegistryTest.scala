@@ -22,14 +22,15 @@ class CollectorRegistryTest extends FlatSpec with Matchers {
   it should "allow register collector" in {
     val registry = CollectorRegistry()
     val collector = new ExampleCollector()
-    val after = registry.register(collector)
-    after should contain (collector)
+    registry.register(collector)
+    registry should contain (collector)
   }
 
   it should "allow to unregister collector" in {
     val registry = CollectorRegistry()
     val collector = new ExampleCollector()
-    val after = registry.register(collector)
-    after.unregister(collector) shouldNot contain (collector)
+    registry.register(collector)
+    registry.unregister(collector)
+    registry shouldBe empty
   }
 }

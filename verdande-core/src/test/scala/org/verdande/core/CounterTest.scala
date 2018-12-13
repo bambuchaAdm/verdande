@@ -50,4 +50,25 @@ class CounterTest extends FlatSpec with Matchers {
     sample.series should have size 2
     sample.series.map(_.labels) should contain(Seq("example", "example"))
   }
+
+  it should "allow register to default registry" in {
+    val metric = Counter.build(
+      name = "example_counter",
+      description = "Example counter without registring it anywhere for tests",
+      labelsKeys = Seq("foo", "bar")
+    )
+    metric.register()
+    CollectorRegistry.default should contain (metric)
+  }
+
+  it should "allow register in any other registry" in {
+    val other = CollectorRegistry()
+    val metric = Counter.build(
+      name = "example_counter",
+      description = "Example counter without registring it anywhere for tests",
+      labelsKeys = Seq("foo", "bar")
+    )
+    metric.register()(other)
+    other should contain (metric)
+  }
 }

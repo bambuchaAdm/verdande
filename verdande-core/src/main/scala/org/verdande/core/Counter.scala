@@ -60,10 +60,10 @@ class CounterMetric(val name: String, val description: String, val labelsNames: 
     SimpleSample(this, voidSeries :: childSeries)
   }
 
-  def register()(implicit registry: CollectorRegistry): Unit = {
+  def register()(implicit registry: CollectorRegistry): CounterMetric = {
     registry.register(this)
+    this
   }
-
 }
 
 object Counter {
