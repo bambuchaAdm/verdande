@@ -11,7 +11,13 @@ trait CollectorRegistry {
   def iterator: Iterator[Collector]
 }
 
-class SimpleCollectorRegistry(collectors: ListSet[Collector]) extends CollectorRegistry {
+object CollectorRegistry  {
+  def apply(): CollectorRegistry = new SimpleCollectorRegistry(ListSet.empty)
+
+  implicit val default: CollectorRegistry = DefaultCollectorRegistry
+}
+
+private[core] class SimpleCollectorRegistry(collectors: ListSet[Collector]) extends CollectorRegistry {
 
   def unregister(collector: Collector): SimpleCollectorRegistry = {
     new SimpleCollectorRegistry(collectors - collector)
@@ -24,14 +30,8 @@ class SimpleCollectorRegistry(collectors: ListSet[Collector]) extends CollectorR
   override def iterator: Iterator[Collector] = collectors.iterator
 }
 
-object SimpleCollectorRegistry  {
-  def apply(): SimpleCollectorRegistry = new SimpleCollectorRegistry(ListSet.empty)
-
-  implicit val default: CollectorRegistry = DefaultCollectorRegistry
-}
-
-object DefaultCollectorRegistry extends CollectorRegistry {
-  private val ref = new AtomicReference[SimpleCollectorRegistry](SimpleCollectorRegistry())
+private[core] object DefaultCollectorRegistry extends CollectorRegistry {
+  private val ref = new AtomicReference[SimpleCollectorRegistry](new SimpleCollectorRegistry(ListSet.empty))
 
   @tailrec
   override def unregister(collector: Collector): CollectorRegistry = {
