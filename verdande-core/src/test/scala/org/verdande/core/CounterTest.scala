@@ -42,7 +42,7 @@ class CounterTest extends FlatSpec with Matchers {
     val metric = Counter.build(
       name = "example_counter",
       description = "Example counter without registring it anywhere for tests",
-      labelsKeys = Seq("foo", "bar")
+      labelsKeys = List("foo", "bar")
     )
     val counter = metric.labels("example", "example")
     counter.inc()
@@ -55,7 +55,7 @@ class CounterTest extends FlatSpec with Matchers {
     val metric = Counter.build(
       name = "example_counter",
       description = "Example counter without registring it anywhere for tests",
-      labelsKeys = Seq("foo", "bar")
+      labelsKeys = List("foo", "bar")
     ).register()
     CollectorRegistry.default should contain (metric)
   }
@@ -65,7 +65,7 @@ class CounterTest extends FlatSpec with Matchers {
     val metric = Counter.build(
       name = "example_counter",
       description = "Example counter without registring it anywhere for tests",
-      labelsKeys = Seq("foo", "bar")
+      labelsKeys = List("foo", "bar")
     ).register()(other)
     other should contain (metric)
   }

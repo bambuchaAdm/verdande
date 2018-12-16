@@ -3,6 +3,8 @@ package org.verdande.core
 case class LabelsValues(values: List[String])
 
 object LabelsValues {
+  val empty = new LabelsValues(List.empty)
+
   def apply(metric: Metric, labelsValue: String*): LabelsValues = {
     if(metric.labelsKeys.length != labelsValue.length){
       throw new IllegalArgumentException("Number of labels values must match to metric labels names")

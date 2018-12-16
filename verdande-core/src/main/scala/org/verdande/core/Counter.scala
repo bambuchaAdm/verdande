@@ -24,7 +24,7 @@ class CounterChild(val labelValues: List[String]) extends Counter {
   def value: Double = buffer.sum()
 }
 
-class CounterMetric(val name: String, val description: String, val labelsKeys: Seq[String])
+class CounterMetric(val name: String, val description: String, val labelsKeys: List[String])
   extends Counter with Metric with Collector with Labelable[Counter] {
 
   private val children = new AtomicReference[Map[LabelsValues, CounterChild]](Map.empty)
@@ -62,6 +62,6 @@ class CounterMetric(val name: String, val description: String, val labelsKeys: S
 }
 
 object Counter {
-  def build(name: String, description: String, labelsKeys: Seq[String] = Seq.empty): CounterMetric =
+  def build(name: String, description: String, labelsKeys: List[String] = List.empty): CounterMetric =
     new CounterMetric(name, description, labelsKeys)
 }

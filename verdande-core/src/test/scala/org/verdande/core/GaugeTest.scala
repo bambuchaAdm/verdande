@@ -5,6 +5,7 @@ import java.util.concurrent.CountDownLatch
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FlatSpec, Matchers}
+import org.verdande.core
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -126,5 +127,17 @@ class GaugeTest extends FlatSpec with Matchers with ScalaFutures {
     shouldHaveOnlyOneSeries{ series =>
       series.value shouldEqual 0.0
     }
+  }
+
+  it should "support labels" in {
+    val gauge = Gauge.build(
+      name = "example_gauge_with_labels",
+      description = "Example gauge for label tests",
+      labelsKeys = List("foo", "bar")
+    )
+    gauge.labels("fizz", "buzz")
+    val sample = gauge.collect()
+    sample.series should have size 2
+    sample.series.map(_.labels) should contain (Seq("fizz", "buzz"))
   }
 }
