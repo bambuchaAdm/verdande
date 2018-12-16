@@ -1,14 +1,33 @@
 package org.verdande.core
 
-import java.time.Instant
+import java.time.{Duration, Instant}
 
 trait Gauge {
   def inc(): Unit
+
   def inc(value: Double): Unit
+
   def dec(): Unit
+
   def dec(value: Double): Unit
+
   def set(value: Double): Unit
-  def setToCurrentTime(): Unit
+
+  def setToCurrentTime(): Unit = {
+    set(Instant.now.getEpochSecond)
+  }
+
+  def time[A](f: => A) = {
+    val start = Instant.now()
+    try {
+      f
+    } finally {
+      val stop = Instant.now()
+      val duration = Duration.between(start, stop)
+      val result = duration.getSeconds + (duration.getNano / 1e9)
+      set(result)
+    }
+  }
 }
 
 case class GaugeMetric(name: String,
@@ -30,10 +49,6 @@ case class GaugeMetric(name: String,
   override def set(value: Double): Unit = buffer = value
 
   override def collect(): Sample = Sample(this, Series(Seq.empty, buffer))
-
-  override def setToCurrentTime(): Unit = {
-    set(Instant.now.getEpochSecond)
-  }
 }
 
 object Gauge {

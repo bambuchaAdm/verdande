@@ -76,10 +76,14 @@ class GaugeTest extends FlatSpec with Matchers {
     gauge.setToCurrentTime()
     val end = Instant.now().getEpochSecond.toDouble
     shouldHaveOnlyOneSeries { series =>
-      println(series.value)
-      println(start)
-      series.value should be >= start
-      series.value should be <= end
+      series.value should (be >= start and be <= end)
+    }
+  }
+
+  it should "allow measure how long is task running" in new Setup {
+    gauge.time(Thread.sleep(100))
+    shouldHaveOnlyOneSeries { series =>
+      series.value should (be >= 0.1 and be <= 0.1)
     }
   }
 }
