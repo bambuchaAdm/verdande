@@ -34,4 +34,12 @@ class GaugeTest extends FlatSpec with Matchers {
       series.value shouldEqual 1.0
     }
   }
+
+  it should "allow increment by arbitrary value" in new Setup {
+    private val step = 10.0
+    gauge.inc(step)
+    shouldHaveOnlyOneSeries{ series =>
+      series.value shouldEqual step
+    }
+  }
 }
