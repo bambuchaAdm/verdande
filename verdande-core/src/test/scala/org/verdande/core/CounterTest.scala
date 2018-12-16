@@ -88,14 +88,19 @@ class CounterTest extends FlatSpec with Matchers {
     }
   }
 
-  it should "allow to narrow " in new ExampleCounter {
+  it should "allow to narrow counted exceptions" in new ExampleCounter {
     intercept[RuntimeException] {
       counter.countExceptions(classOf[IllegalArgumentException]) {
         throw new RuntimeException("Example exception")
       }
     }
+    intercept[IllegalArgumentException] {
+      counter.countExceptions(classOf[IllegalArgumentException]) {
+        throw new IllegalArgumentException("Example exception")
+      }
+    }
     shouldHaveOnlyOneSeries { series =>
-      series.value shouldEqual 0.0
+      series.value shouldEqual 1.0
     }
   }
 }

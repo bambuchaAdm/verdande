@@ -13,7 +13,7 @@ trait Counter {
     try {
       f
     } catch {
-      case NonFatal(e) if exceptions.isEmpty || exceptions.exists(exception => exception.isInstance(e)) =>
+      case NonFatal(e) if exceptions.isEmpty || exceptions.exists(_.isInstance(e)) =>
         inc()
         throw e
     }
