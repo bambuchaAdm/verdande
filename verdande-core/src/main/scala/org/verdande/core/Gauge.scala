@@ -99,7 +99,7 @@ final case class GaugeMetric(name: String,
 
   override def collect(): Sample = {
     val childSeries: List[Series] = childs.get().map {
-      case (key, value) => value.value
+      case (_, value) => value.value
     }(collection.breakOut)
     val noLabelSeries = noLabel.value
 
@@ -109,7 +109,7 @@ final case class GaugeMetric(name: String,
 
 object Gauge {
   def build(name: String, description: String, labelsKeys: List[String] = List.empty): GaugeMetric = {
-    new GaugeMetric(name, description, labelsKeys)
+    GaugeMetric(name, description, labelsKeys)
   }
 }
 
