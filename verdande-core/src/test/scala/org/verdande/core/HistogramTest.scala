@@ -44,6 +44,19 @@ class HistogramTest extends FlatSpec with Matchers {
     )
   }
 
+  it should "allow to add labels" in {
+    val histogram = Histogram.build(
+      name = "example_labeled_histogram",
+      description = "Histogram with labels",
+      labelsKeys = List("foo", "bar")
+    )
+    histogram.labels("fizz", "buzz")
+    val sample = histogram.collect()
+    atLeast(1, sample.series) should have (
+      'labelKeys (List("foo", "bar")),
+      'labelValues (List("fizz", "buzz"))
+    )
+  }
 
 
 }
