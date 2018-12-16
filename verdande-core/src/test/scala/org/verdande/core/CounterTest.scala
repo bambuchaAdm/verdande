@@ -10,6 +10,13 @@ class CounterTest extends FlatSpec with Matchers {
       name = "example_counter",
       description = "Example counter without registring it anywhere for tests"
     )
+
+    def shouldHaveOnlyOneSeries(f: Series => Unit): Unit = {
+      val result = counter.collect()
+      result.series should have size 1
+      val series = result.series.head
+      f(series)
+    }
   }
 
   it should "start from zero" in new ExampleCounter {
@@ -68,5 +75,27 @@ class CounterTest extends FlatSpec with Matchers {
       labelsKeys = List("foo", "bar")
     ).register()(other)
     other should contain (metric)
+  }
+
+  it should "count exceptions" in new ExampleCounter {
+    intercept[RuntimeException] {
+      counter.countExceptions() {
+        throw new RuntimeException("Example exception")
+      }
+    }
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual 1.0
+    }
+  }
+
+  it should "allow to narrow " in new ExampleCounter {
+    intercept[RuntimeException] {
+      counter.countExceptions(classOf[IllegalArgumentException]) {
+        throw new RuntimeException("Example exception")
+      }
+    }
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual 0.0
+    }
   }
 }

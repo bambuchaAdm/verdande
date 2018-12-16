@@ -3,10 +3,21 @@ package org.verdande.core
 import java.util.concurrent.atomic.{AtomicReference, DoubleAdder}
 
 import scala.annotation.tailrec
+import scala.util.control.NonFatal
 
 trait Counter {
   def inc()
   def inc(value: Double)
+
+  def countExceptions[A](exceptions: Class[_ <: Throwable]*)(f: => A): A = {
+    try {
+      f
+    } catch {
+      case NonFatal(e) if exceptions.isEmpty || exceptions.exists(exception => exception.isInstance(e)) =>
+        inc()
+        throw e
+    }
+  }
 }
 
 private[core] class CounterChild(val labelValues: List[String]) extends Counter {
