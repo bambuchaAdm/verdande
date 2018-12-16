@@ -20,6 +20,15 @@ trait Collector extends Metric {
   }
 }
 
+object Collector {
+  def asString(value: Double): String = value match {
+    case Double.PositiveInfinity => "+Inf"
+    case Double.NegativeInfinity => "-Inf"
+    case Double.NaN => "NaN"
+    case other => java.lang.Double.toString(other)
+  }
+}
+
 
 
 

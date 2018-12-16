@@ -96,9 +96,9 @@ final case class GaugeMetric(name: String,
 
   override def collect(): Sample = {
     val childSeries: List[Series] = childs.get().map {
-      case (_, value) => Series(name, value.labelsValues.values, value.value)
+      case (_, value) => Series(name, labelsKeys, value.labelsValues.values, value.value)
     }(collection.breakOut)
-    val noLabelSeries = Series(name, Seq.empty, noLabel.value)
+    val noLabelSeries = Series(name, labelsKeys, noLabel.labelsValues.values, noLabel.value)
 
     Sample(this, noLabelSeries :: childSeries)
   }

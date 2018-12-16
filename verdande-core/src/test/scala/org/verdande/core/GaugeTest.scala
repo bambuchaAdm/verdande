@@ -138,6 +138,6 @@ class GaugeTest extends FlatSpec with Matchers with ScalaFutures {
     gauge.labels("fizz", "buzz")
     val sample = gauge.collect()
     sample.series should have size 2
-    sample.series.map(_.labels) should contain (Seq("fizz", "buzz"))
+    sample.series.map(_.labelValues) should contain (Seq("fizz", "buzz"))
   }
 }

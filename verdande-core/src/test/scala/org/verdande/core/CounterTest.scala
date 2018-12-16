@@ -21,22 +21,26 @@ class CounterTest extends FlatSpec with Matchers {
 
   it should "start from zero" in new ExampleCounter {
     val scrap = counter.collect()
-    scrap.series should have length 1
-    scrap.series.head.value shouldEqual 0.0
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual 0.0
+    }
   }
 
   it should "allow to increment by one" in new ExampleCounter {
+    counter.inc()
     val scrap = counter.collect()
-    scrap.series should have length 1
-    scrap.series.head.value shouldEqual 0.0
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual 1.0
+    }
   }
 
   it should "allow to increment by more then one" in new ExampleCounter {
     val value  = 10.0
     counter.inc(value)
     val scrap = counter.collect()
-    scrap.series should have length 1
-    scrap.series.head.value shouldEqual value
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual value
+    }
   }
 
   it should "throw exception on negative increment" in new ExampleCounter {
@@ -55,7 +59,7 @@ class CounterTest extends FlatSpec with Matchers {
     counter.inc()
     val sample = metric.collect()
     sample.series should have size 2
-    sample.series.map(_.labels) should contain(Seq("example", "example"))
+    sample.series.map(_.labelValues) should contain(Seq("example", "example"))
   }
 
   it should "allow register to default registry" in {

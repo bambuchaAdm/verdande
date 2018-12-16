@@ -64,9 +64,9 @@ final case class CounterMetric(name: String, description: String, labelsKeys: Li
 
   override def collect(): Sample = {
     val childSeries: List[Series] = children.get().map {
-      case (_, value) => Series(name, value.labelValues, value.value)
+      case (_, value) => Series(name, labelsKeys, value.labelValues, value.value)
     }(collection.breakOut)
-    val voidSeries = Series(name, noLabel.labelValues, noLabel.value)
+    val voidSeries = Series(name, labelsKeys, noLabel.labelValues, noLabel.value)
 
     Sample(this, voidSeries :: childSeries)
   }
