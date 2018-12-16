@@ -1,6 +1,7 @@
 package org.verdande.core
 
 import java.time.{Duration, Instant}
+import java.util.concurrent.atomic.DoubleAdder
 
 trait Gauge {
   def inc(): Unit
@@ -28,27 +29,40 @@ trait Gauge {
       set(result)
     }
   }
+
+  def track[A](f: => A): A = {
+    inc()
+    try {
+      f
+    } finally {
+      dec()
+    }
+  }
 }
 
 case class GaugeMetric(name: String,
                        description: String,
                        labelsKeys: Seq[String]) extends Gauge with Collector with Metric {
 
-  var buffer: Double = 0.0
+  val incs: DoubleAdder = new DoubleAdder()
+  val decs: DoubleAdder = new DoubleAdder()
 
-  override def inc(): Unit = buffer += 1.0
+  override def inc(): Unit = incs.add(1.0)
 
-  override def inc(value: Double): Unit = {
-    buffer += value
+  override def inc(value: Double): Unit = incs.add(value)
+
+
+  override def dec(): Unit = decs.add(1.0)
+
+  override def dec(value: Double): Unit = decs.add(value)
+
+  override def set(value: Double): Unit = {
+    incs.reset()
+    decs.reset()
+    incs.add(value)
   }
 
-  override def dec(): Unit = buffer -= 1.0
-
-  override def dec(value: Double): Unit = buffer -= value
-
-  override def set(value: Double): Unit = buffer = value
-
-  override def collect(): Sample = Sample(this, Series(Seq.empty, buffer))
+  override def collect(): Sample = Sample(this, Series(Seq.empty, incs.doubleValue() - decs.doubleValue()))
 }
 
 object Gauge {

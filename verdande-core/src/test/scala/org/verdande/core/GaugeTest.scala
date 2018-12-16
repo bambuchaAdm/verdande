@@ -1,10 +1,14 @@
 package org.verdande.core
 
 import java.time.Instant
+import java.util.concurrent.CountDownLatch
 
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FlatSpec, Matchers}
 
-class GaugeTest extends FlatSpec with Matchers {
+import scala.concurrent.{ExecutionContext, Future}
+
+class GaugeTest extends FlatSpec with Matchers with ScalaFutures {
 
   behavior of "Gauge"
 
@@ -40,7 +44,7 @@ class GaugeTest extends FlatSpec with Matchers {
   it should "allow increment by arbitrary value" in new Setup {
     private val step = 10.0
     gauge.inc(step)
-    shouldHaveOnlyOneSeries{ series =>
+    shouldHaveOnlyOneSeries { series =>
       series.value shouldEqual step
     }
   }
@@ -83,7 +87,44 @@ class GaugeTest extends FlatSpec with Matchers {
   it should "allow measure how long is task running" in new Setup {
     gauge.time(Thread.sleep(100))
     shouldHaveOnlyOneSeries { series =>
-      series.value should (be >= 0.1 and be <= 0.1)
+      series.value should (be >= 0.1 and be <= 0.105) // 5ms margin for threads FIXME use external mockable time provider
+    }
+  }
+
+  it should "track number of in-progress calls" in new Setup {
+    implicit val ec = ExecutionContext.global
+    private val maxRequests = 10
+    val preparationLatch = new CountDownLatch(maxRequests)
+    val requests = Range(0, maxRequests).map{ _ =>
+      val latch = new CountDownLatch(1)
+      val future = Future.apply {
+        gauge.track {
+          preparationLatch.countDown()
+          latch.await()
+        }
+      }
+      (latch, future)
+    }
+    preparationLatch.await()
+    shouldHaveOnlyOneSeries {
+      series => series.value shouldEqual maxRequests
+    }
+    requests.foreach {
+      case (latch, future) =>
+        latch.countDown()
+        future.futureValue
+        shouldHaveOnlyOneSeries {
+          series => series.value shouldEqual requests.filterNot(_._2.isCompleted).length
+        }
+    }
+  }
+
+  it should "handle exceptions when tracking requests" in new Setup {
+    intercept[RuntimeException]{
+      gauge.track(throw new RuntimeException("example"))
+    }
+    shouldHaveOnlyOneSeries{ series =>
+      series.value shouldEqual 0.0
     }
   }
 }
