@@ -24,7 +24,7 @@ case class GaugeMetric(name: String,
 
   override def dec(value: Double): Unit = buffer -= value
 
-  override def set(value: Double): Unit = ???
+  override def set(value: Double): Unit = buffer = value
 
   override def collect(): Sample = Sample(this, Series(Seq.empty, buffer))
 }
