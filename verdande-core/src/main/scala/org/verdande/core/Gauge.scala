@@ -8,7 +8,12 @@ trait Gauge {
   def set(value: Double): Unit
 }
 
-case class GaugeMetric() extends Gauge with Collector {
+case class GaugeMetric(name: String,
+                       description: String,
+                       labelsKeys: Seq[String]) extends Gauge with Collector with Metric {
+
+  var buffer: Double = 0.0
+
   override def inc(): Unit = ???
 
   override def inc(value: Double): Unit = ???
@@ -19,12 +24,12 @@ case class GaugeMetric() extends Gauge with Collector {
 
   override def set(value: Double): Unit = ???
 
-  override def collect(): Sample = ???
+  override def collect(): Sample = Sample(this, Series(Seq.empty, buffer))
 }
 
 object Gauge {
   def build(name: String, description: String): GaugeMetric = {
-    new GaugeMetric()
+    new GaugeMetric(name, description, Seq.empty)
   }
 }
 
