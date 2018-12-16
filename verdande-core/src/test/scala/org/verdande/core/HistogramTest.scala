@@ -58,5 +58,20 @@ class HistogramTest extends FlatSpec with Matchers {
     )
   }
 
+  it should "increment first bucket larger then" in new ExampleHistogram {
+    historgram.observe(9)
+    val sample = historgram.collect()
+    atLeast(1, sample.series) should have (
+      'value (1.0),
+      'name ("example_histogram_bucket"),
+      'labelValues (List("10.0")),
+      'labelKeys (List("le"))
+    )
+    atLeast(1, sample.series) should have (
+      'value (9.0),
+      'name ("example_histogram_sum")
+    )
+  }
+
 
 }
