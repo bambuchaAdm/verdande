@@ -15,7 +15,7 @@ trait TimeProvider {
 }
 
 object TimeProvider {
-  implicit val defaultInstantTypeProvider = new TimeProvider {
+  implicit val systemTime = new TimeProvider {
     override def now: Instant = Instant.now()
   }
 }
