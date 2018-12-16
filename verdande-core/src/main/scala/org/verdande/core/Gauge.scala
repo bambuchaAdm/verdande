@@ -20,7 +20,7 @@ case class GaugeMetric(name: String,
     buffer += value
   }
 
-  override def dec(): Unit = ???
+  override def dec(): Unit = buffer -= 1.0
 
   override def dec(value: Double): Unit = ???
 
