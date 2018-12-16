@@ -43,10 +43,18 @@ class GaugeTest extends FlatSpec with Matchers {
     }
   }
 
-  it should "allow decremetn by one" in new Setup {
+  it should "allow decrement by one" in new Setup {
     gauge.dec()
     shouldHaveOnlyOneSeries { series =>
       series.value shouldEqual -1.0
+    }
+  }
+
+  it should "allow decrement by arbitrary value" in new Setup {
+    private val step = 10.0
+    gauge.dec(step)
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual -10.0
     }
   }
 }
