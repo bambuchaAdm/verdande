@@ -14,7 +14,7 @@ case class GaugeMetric(name: String,
 
   var buffer: Double = 0.0
 
-  override def inc(): Unit = ???
+  override def inc(): Unit = buffer += 1.0
 
   override def inc(value: Double): Unit = ???
 
