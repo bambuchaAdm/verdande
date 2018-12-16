@@ -9,7 +9,7 @@ trait Counter {
   def inc(value: Double)
 }
 
-class CounterChild(val labelValues: List[String]) extends Counter {
+private[core] class CounterChild(val labelValues: List[String]) extends Counter {
   val buffer = new DoubleAdder()
 
   override def inc(): Unit = buffer.add(1.0)
@@ -24,7 +24,7 @@ class CounterChild(val labelValues: List[String]) extends Counter {
   def value: Double = buffer.sum()
 }
 
-class CounterMetric(val name: String, val description: String, val labelsKeys: List[String])
+final case class CounterMetric(name: String, description: String, labelsKeys: List[String])
   extends Counter with Collector with Labelable[Counter] {
 
   private val children = new AtomicReference[Map[LabelsValues, CounterChild]](Map.empty)
@@ -36,7 +36,7 @@ class CounterMetric(val name: String, val description: String, val labelsKeys: L
   override def inc(value: Double): Unit = noLabel.inc(value)
 
   @tailrec
-  override final def labels(value: LabelsValues): Counter = {
+  override def labels(value: LabelsValues): Counter = {
     val map = children.get()
     map.get(value) match {
       case Some(counter) => counter
@@ -63,5 +63,5 @@ class CounterMetric(val name: String, val description: String, val labelsKeys: L
 
 object Counter {
   def build(name: String, description: String, labelsKeys: List[String] = List.empty): CounterMetric =
-    new CounterMetric(name, description, labelsKeys)
+    CounterMetric(name, description, labelsKeys)
 }

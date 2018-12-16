@@ -63,9 +63,9 @@ private[core] class GaugeChild(labelsValues: LabelsValues) extends Gauge {
   def value = Series(labelsValues.values, incs.doubleValue() - decs.doubleValue())
 }
 
-case class GaugeMetric(name: String,
-                       description: String,
-                       labelsKeys: List[String]) extends Gauge with Collector with Labelable[Gauge] {
+final case class GaugeMetric(name: String,
+                             description: String,
+                             labelsKeys: List[String]) extends Gauge with Collector with Labelable[Gauge] {
 
   private val childs = new AtomicReference[Map[LabelsValues, GaugeChild]](Map.empty)
 
@@ -82,14 +82,14 @@ case class GaugeMetric(name: String,
   override def set(value: Double): Unit = noLabel.set(value)
 
   @tailrec
-  override final def labels(values: LabelsValues): Gauge = {
+  override def labels(values: LabelsValues): Gauge = {
     val now = childs.get()
     now.get(values) match {
       case Some(gauge) => gauge
       case None =>
         val child = new GaugeChild(values)
         val next = now.updated(values, child)
-        if(childs.compareAndSet(now, next)) {
+        if (childs.compareAndSet(now, next)) {
           child
         } else {
           labels(values)
@@ -98,7 +98,7 @@ case class GaugeMetric(name: String,
   }
 
   override def collect(): Sample = {
-    val childSeries: List[Series] = childs.get().map{
+    val childSeries: List[Series] = childs.get().map {
       case (key, value) => value.value
     }(collection.breakOut)
     val noLabelSeries = noLabel.value
