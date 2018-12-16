@@ -82,4 +82,26 @@ class HistogramTest extends FlatSpec with Matchers {
       )
     }
   }
+
+  it should "throw when buckets doesn have Positive Infinite" in {
+    intercept[IllegalArgumentException] {
+      Histogram.build(
+        name = "bad_histogram",
+        description = "",
+        labelsKeys = List("foo", "le"),
+        buckets = Seq(1.0, 2.0)
+      )
+    }
+  }
+
+  it should "throw when buckets are not monotonic" in {
+    intercept[IllegalArgumentException] {
+      Histogram.build(
+        name = "bad_histogram",
+        description = "",
+        labelsKeys = List("foo", "le"),
+        buckets = Seq(2.0, 1.0, Double.PositiveInfinity)
+      )
+    }
+  }
 }
