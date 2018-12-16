@@ -17,9 +17,6 @@ case class GaugeMetric(name: String,
   override def inc(): Unit = buffer += 1.0
 
   override def inc(value: Double): Unit = {
-    if(value < 0){
-      throw new IllegalArgumentException("Gauge increased by negative value")
-    }
     buffer += value
   }
 

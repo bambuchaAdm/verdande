@@ -42,10 +42,4 @@ class GaugeTest extends FlatSpec with Matchers {
       series.value shouldEqual step
     }
   }
-
-  it should "reject negative increments" in new Setup {
-    intercept[IllegalArgumentException] {
-      gauge.inc(-10.0)
-    }
-  }
 }
