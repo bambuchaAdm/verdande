@@ -14,10 +14,6 @@ object LabelsValues {
   }
 }
 
-case class LabelsKeys(values: List[String])
-
-
-
 trait Labelable[T] { self: Metric =>
   def labels(labels: LabelsValues): T
   def labels(values: String*): T = labels(LabelsValues.apply(this, values: _*))
