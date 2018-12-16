@@ -1,11 +1,14 @@
 package org.verdande.core
 
+import java.time.Instant
+
 trait Gauge {
   def inc(): Unit
   def inc(value: Double): Unit
   def dec(): Unit
   def dec(value: Double): Unit
   def set(value: Double): Unit
+  def setToCurrentTime(): Unit
 }
 
 case class GaugeMetric(name: String,
@@ -27,6 +30,10 @@ case class GaugeMetric(name: String,
   override def set(value: Double): Unit = buffer = value
 
   override def collect(): Sample = Sample(this, Series(Seq.empty, buffer))
+
+  override def setToCurrentTime(): Unit = {
+    set(Instant.now.getEpochSecond)
+  }
 }
 
 object Gauge {

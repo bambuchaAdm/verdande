@@ -1,5 +1,7 @@
 package org.verdande.core
 
+import java.time.Instant
+
 import org.scalatest.{FlatSpec, Matchers}
 
 class GaugeTest extends FlatSpec with Matchers {
@@ -66,6 +68,18 @@ class GaugeTest extends FlatSpec with Matchers {
     gauge.set(42.0)
     shouldHaveOnlyOneSeries { series =>
       series.value shouldEqual 42.0
+    }
+  }
+
+  it should "allow set to current unix timestamp" in new Setup {
+    val start = Instant.now().getEpochSecond.toDouble
+    gauge.setToCurrentTime()
+    val end = Instant.now().getEpochSecond.toDouble
+    shouldHaveOnlyOneSeries { series =>
+      println(series.value)
+      println(start)
+      series.value should be >= start
+      series.value should be <= end
     }
   }
 }
