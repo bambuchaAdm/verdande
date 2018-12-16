@@ -88,7 +88,7 @@ class GaugeTest extends FlatSpec with Matchers with ScalaFutures {
   it should "allow measure how long is task running" in new Setup {
     gauge.time(Thread.sleep(100))
     shouldHaveOnlyOneSeries { series =>
-      series.value should (be >= 0.1 and be <= 0.105) // 5ms margin for threads FIXME use external mockable time provider
+      series.value should (be >= 0.1 and be <= 0.125) // 5ms margin for threads FIXME use external mockable time provider
     }
   }
 

@@ -38,7 +38,7 @@ trait Gauge {
   }
 }
 
-private[core] class GaugeChild(labelsValues: LabelsValues) extends Gauge {
+private[core] case class GaugeChild(labelsValues: LabelsValues) extends Gauge {
   val incs: DoubleAdder = new DoubleAdder()
   val decs: DoubleAdder = new DoubleAdder()
 
@@ -56,7 +56,8 @@ private[core] class GaugeChild(labelsValues: LabelsValues) extends Gauge {
     incs.add(value)
   }
 
-  def value = Series(labelsValues.values, incs.doubleValue() - decs.doubleValue())
+
+  def value = incs.doubleValue() - decs.doubleValue()
 }
 
 final case class GaugeMetric(name: String,
@@ -95,9 +96,9 @@ final case class GaugeMetric(name: String,
 
   override def collect(): Sample = {
     val childSeries: List[Series] = childs.get().map {
-      case (_, value) => value.value
+      case (_, value) => Series(name, value.labelsValues.values, value.value)
     }(collection.breakOut)
-    val noLabelSeries = noLabel.value
+    val noLabelSeries = Series(name, Seq.empty, noLabel.value)
 
     Sample(this, noLabelSeries :: childSeries)
   }
