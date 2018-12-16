@@ -1,6 +1,6 @@
 package org.verdande.core
 
-import org.scalatest.{FlatSpec, Matchers, Outcome}
+import org.scalatest.{FlatSpec, Matchers}
 
 class GaugeTest extends FlatSpec with Matchers {
 
