@@ -50,8 +50,7 @@ case class GaugeMetric(name: String,
   override def inc(): Unit = incs.add(1.0)
 
   override def inc(value: Double): Unit = incs.add(value)
-
-
+  
   override def dec(): Unit = decs.add(1.0)
 
   override def dec(value: Double): Unit = decs.add(value)
