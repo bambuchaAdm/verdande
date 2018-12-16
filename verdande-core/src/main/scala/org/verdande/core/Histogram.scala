@@ -95,8 +95,22 @@ final case class HistogramMetric(name: String,
 object Histogram {
   val defaultBuckets = Array(0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5.0, 7.5, 10, Double.PositiveInfinity)
 
-  def build(name: String, description: String, labelsKeys: List[String] = List.empty): HistogramMetric = {
-    HistogramMetric(name, description, labelsKeys, defaultBuckets)
+  def build(name: String, description: String, labelsKeys: List[String] = List.empty, buckets: Seq[Double] = defaultBuckets): HistogramMetric = {
+    if (buckets.isEmpty) {
+      throw new IllegalArgumentException("there should be at lest two buckets")
+    }
+    if (buckets.last != Double.PositiveInfinity) {
+      throw new IllegalArgumentException("buckets doesn't end with Positive Infinity")
+    }
+    buckets.zip(buckets.tail).foreach { case (first, second) =>
+      if (first >= second) {
+        throw new IllegalArgumentException("bucket is not monotonically increasing")
+      }
+    }
+    if (labelsKeys.contains("le")) {
+      throw new IllegalArgumentException("le is not reserved label for histogram")
+    }
+    HistogramMetric(name, description, labelsKeys, buckets)
   }
 
 }

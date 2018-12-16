@@ -73,5 +73,13 @@ class HistogramTest extends FlatSpec with Matchers {
     )
   }
 
-
+  it should "throw whene 'le' is used as label" in {
+    intercept[IllegalArgumentException] {
+      Histogram.build(
+        name = "bad_histogram",
+        description = "",
+        labelsKeys = List("foo", "le")
+      )
+    }
+  }
 }
