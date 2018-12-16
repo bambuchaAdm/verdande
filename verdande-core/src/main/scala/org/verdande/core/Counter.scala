@@ -25,7 +25,7 @@ class CounterChild(val labelValues: List[String]) extends Counter {
 }
 
 class CounterMetric(val name: String, val description: String, val labelsKeys: List[String])
-  extends Counter with Metric with Collector with Labelable[Counter] {
+  extends Counter with Collector with Labelable[Counter] {
 
   private val children = new AtomicReference[Map[LabelsValues, CounterChild]](Map.empty)
 

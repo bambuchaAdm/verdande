@@ -65,7 +65,7 @@ private[core] class GaugeChild(labelsValues: LabelsValues) extends Gauge {
 
 case class GaugeMetric(name: String,
                        description: String,
-                       labelsKeys: List[String]) extends Gauge with Collector with Metric with Labelable[Gauge] {
+                       labelsKeys: List[String]) extends Gauge with Collector with Labelable[Gauge] {
 
   private val childs = new AtomicReference[Map[LabelsValues, GaugeChild]](Map.empty)
 
