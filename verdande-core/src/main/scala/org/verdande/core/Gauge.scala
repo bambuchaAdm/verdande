@@ -1,6 +1,5 @@
 package org.verdande.core
 
-import java.time.{Duration, Instant}
 import java.util.concurrent.atomic.{AtomicReference, DoubleAdder}
 
 import scala.annotation.tailrec
@@ -16,19 +15,16 @@ trait Gauge {
 
   def set(value: Double): Unit
 
-  def setToCurrentTime(): Unit = {
-    set(Instant.now.getEpochSecond)
+  def setToCurrentTime()(implicit timeProvider: TimeProvider): Unit = {
+    set(timeProvider.timestamp)
   }
 
-  def time[A](f: => A) = {
-    val start = Instant.now()
+  def time[A](f: => A)(implicit timeProvider: TimeProvider) = {
+    val start = timeProvider.now
     try {
       f
     } finally {
-      val stop = Instant.now()
-      val duration = Duration.between(start, stop)
-      val result = duration.getSeconds + (duration.getNano / 1e9)
-      set(result)
+      set(timeProvider.durationFrom(start))
     }
   }
 
