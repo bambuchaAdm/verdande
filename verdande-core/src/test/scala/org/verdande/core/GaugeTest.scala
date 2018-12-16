@@ -57,4 +57,15 @@ class GaugeTest extends FlatSpec with Matchers {
       series.value shouldEqual -10.0
     }
   }
+
+  it should "allow set to arbitrary value" in new Setup {
+    gauge.inc(1.0)
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual 1.0
+    }
+    gauge.set(42.0)
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual 42.0
+    }
+  }
 }
