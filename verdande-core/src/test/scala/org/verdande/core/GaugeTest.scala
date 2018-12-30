@@ -14,10 +14,7 @@ class GaugeTest extends FlatSpec with Matchers with ScalaFutures {
   behavior of "Gauge"
 
   trait Setup {
-    val gauge = Gauge.build(
-      name = "example",
-      description = "Example gauge for tests"
-    )
+    val gauge = Gauge.build(name = "example", description = "Example gauge for tests")
 
     def shouldHaveOnlyOneSeries(f: Series => Unit): Unit = {
       val result = gauge.collect()
@@ -96,7 +93,7 @@ class GaugeTest extends FlatSpec with Matchers with ScalaFutures {
     implicit val ec = ExecutionContext.global
     private val maxRequests = 10
     val preparationLatch = new CountDownLatch(maxRequests)
-    val requests = Range(0, maxRequests).map{ _ =>
+    val requests = Range(0, maxRequests).map { _ =>
       val latch = new CountDownLatch(1)
       val future = Future.apply {
         gauge.track {
@@ -107,37 +104,33 @@ class GaugeTest extends FlatSpec with Matchers with ScalaFutures {
       (latch, future)
     }
     preparationLatch.await()
-    shouldHaveOnlyOneSeries {
-      series => series.value shouldEqual maxRequests
+    shouldHaveOnlyOneSeries { series =>
+      series.value shouldEqual maxRequests
     }
     requests.foreach {
       case (latch, future) =>
         latch.countDown()
         future.futureValue
-        shouldHaveOnlyOneSeries {
-          series => series.value shouldEqual requests.filterNot(_._2.isCompleted).length
+        shouldHaveOnlyOneSeries { series =>
+          series.value shouldEqual requests.filterNot(_._2.isCompleted).length
         }
     }
   }
 
   it should "handle exceptions when tracking requests" in new Setup {
-    intercept[RuntimeException]{
+    intercept[RuntimeException] {
       gauge.track(throw new RuntimeException("example"))
     }
-    shouldHaveOnlyOneSeries{ series =>
+    shouldHaveOnlyOneSeries { series =>
       series.value shouldEqual 0.0
     }
   }
 
   it should "support labels" in {
-    val gauge = Gauge.build(
-      name = "example_gauge_with_labels",
-      description = "Example gauge for label tests",
-      labelsKeys = List("foo", "bar")
-    )
+    val gauge = Gauge.build(name = "example_gauge_with_labels", description = "Example gauge for label tests", labelsKeys = List("foo", "bar"))
     gauge.labels("fizz", "buzz")
     val sample = gauge.collect()
     sample.series should have size 2
-    sample.series.map(_.labelValues) should contain (Seq("fizz", "buzz"))
+    sample.series.map(_.labelValues) should contain(Seq("fizz", "buzz"))
   }
 }

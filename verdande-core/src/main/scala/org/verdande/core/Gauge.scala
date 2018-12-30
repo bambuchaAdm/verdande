@@ -15,9 +15,8 @@ trait Gauge {
 
   def set(value: Double): Unit
 
-  def setToCurrentTime()(implicit timeProvider: TimeProvider): Unit = {
+  def setToCurrentTime()(implicit timeProvider: TimeProvider): Unit =
     set(timeProvider.timestamp)
-  }
 
   def time[A](f: => A)(implicit timeProvider: TimeProvider) = {
     val start = timeProvider.now
@@ -56,13 +55,10 @@ private[core] case class GaugeChild(labelsValues: LabelsValues) extends Gauge {
     incs.add(value)
   }
 
-
   def value = incs.doubleValue() - decs.doubleValue()
 }
 
-final case class GaugeMetric(name: String,
-                             description: String,
-                             labelsKeys: List[String]) extends Gauge with Collector with Labelable[Gauge] {
+final case class GaugeMetric(name: String, description: String, labelsKeys: List[String]) extends Gauge with Collector with Labelable[Gauge] {
 
   private val childs = new AtomicReference[Map[LabelsValues, GaugeChild]](Map.empty)
 
@@ -95,9 +91,11 @@ final case class GaugeMetric(name: String,
   }
 
   override def collect(): Sample = {
-    val childSeries: List[Series] = childs.get().map {
-      case (_, value) => Series(name, labelsKeys, value.labelsValues.values, value.value)
-    }(collection.breakOut)
+    val childSeries: List[Series] = childs
+      .get()
+      .map {
+        case (_, value) => Series(name, labelsKeys, value.labelsValues.values, value.value)
+      }(collection.breakOut)
     val noLabelSeries = Series(name, labelsKeys, noLabel.labelsValues.values, noLabel.value)
 
     Sample(this, noLabelSeries :: childSeries)
@@ -105,10 +103,6 @@ final case class GaugeMetric(name: String,
 }
 
 object Gauge {
-  def build(name: String, description: String, labelsKeys: List[String] = List.empty): GaugeMetric = {
+  def build(name: String, description: String, labelsKeys: List[String] = List.empty): GaugeMetric =
     GaugeMetric(name, description, labelsKeys)
-  }
 }
-
-
-

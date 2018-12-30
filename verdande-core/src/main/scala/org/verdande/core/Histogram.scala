@@ -17,9 +17,7 @@ trait Histogram {
   }
 }
 
-private[core] final case class HistogramChild(labelsKeys: List[String],
-                                              labelsValues: List[String],
-                                              buckets: Seq[Double]) extends Histogram {
+private[core] final case class HistogramChild(labelsKeys: List[String], labelsValues: List[String], buckets: Seq[Double]) extends Histogram {
   private val labels: Seq[String] = buckets.map(Collector.asString)(collection.breakOut)
 
   private val adders = Array.fill(buckets.size)(new DoubleAdder)
@@ -40,7 +38,7 @@ private[core] final case class HistogramChild(labelsKeys: List[String],
 
     def sumSeries = Series(name + "_sum", labelsKeys, labelsValues, sum.sum())
 
-    def bucketsSeries(index: Int, accumulator: Double, outcome: List[Series]): List[Series] = {
+    def bucketsSeries(index: Int, accumulator: Double, outcome: List[Series]): List[Series] =
       if (index < buckets.length) {
         val result = adders(index).sum() + accumulator
         val next = Series(name + "_bucket", "le" :: labelsKeys, labels(index) :: labelsValues, result) :: outcome
@@ -48,25 +46,20 @@ private[core] final case class HistogramChild(labelsKeys: List[String],
       } else {
         countSeries(accumulator) :: sumSeries :: outcome
       }
-    }
 
     bucketsSeries(0, 0.0, List.empty)
   }
 
 }
 
-final case class HistogramMetric(name: String,
-                                 description: String,
-                                 labelsKeys: List[String],
-                                 buckets: Seq[Double]) extends Collector with Histogram with Labelable[Histogram] {
+final case class HistogramMetric(name: String, description: String, labelsKeys: List[String], buckets: Seq[Double]) extends Collector with Histogram with Labelable[Histogram] {
 
   private val children = new AtomicReference[Map[LabelsValues, HistogramChild]](Map.empty)
 
   private val noLabels = HistogramChild(labelsKeys, labelsKeys.map(_ => ""), buckets)
 
-  override def observe(value: Double): Unit = {
+  override def observe(value: Double): Unit =
     noLabels.observe(value)
-  }
 
   override def collect(): Sample = {
     val series = children.get().flatMap {
@@ -102,10 +95,11 @@ object Histogram {
     if (buckets.last != Double.PositiveInfinity) {
       throw new IllegalArgumentException("buckets doesn't end with Positive Infinity")
     }
-    buckets.zip(buckets.tail).foreach { case (first, second) =>
-      if (first >= second) {
-        throw new IllegalArgumentException("bucket is not monotonically increasing")
-      }
+    buckets.zip(buckets.tail).foreach {
+      case (first, second) =>
+        if (first >= second) {
+          throw new IllegalArgumentException("bucket is not monotonically increasing")
+        }
     }
     if (labelsKeys.contains("le")) {
       throw new IllegalArgumentException("le is not reserved label for histogram")
