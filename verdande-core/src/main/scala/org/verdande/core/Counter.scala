@@ -9,7 +9,7 @@ trait Counter {
   def inc()
   def inc(value: Double)
 
-  def countExceptions[A](exceptions: Class[_ <: Throwable]*)(f: => A): A = {
+  def countExceptions[A](exceptions: Class[_ <: Throwable]*)(f: => A): A =
     try {
       f
     } catch {
@@ -17,7 +17,6 @@ trait Counter {
         inc()
         throw e
     }
-  }
 }
 
 private[core] class CounterChild(val labelValues: List[String]) extends Counter {
@@ -35,8 +34,7 @@ private[core] class CounterChild(val labelValues: List[String]) extends Counter 
   def value: Double = buffer.sum()
 }
 
-final case class CounterMetric(name: String, description: String, labelsKeys: List[String])
-  extends Counter with Collector with Labelable[Counter] {
+final case class CounterMetric(name: String, description: String, labelsKeys: List[String]) extends Counter with Collector with Labelable[Counter] {
 
   private val children = new AtomicReference[Map[LabelsValues, CounterChild]](Map.empty)
 
@@ -54,7 +52,7 @@ final case class CounterMetric(name: String, description: String, labelsKeys: Li
       case None =>
         val counter = new CounterChild(value.values)
         val next = map.updated(value, counter)
-        if(children.compareAndSet(map, next)){
+        if (children.compareAndSet(map, next)) {
           counter
         } else {
           labels(value)
@@ -63,9 +61,11 @@ final case class CounterMetric(name: String, description: String, labelsKeys: Li
   }
 
   override def collect(): Sample = {
-    val childSeries: List[Series] = children.get().map {
-      case (_, value) => Series(name, labelsKeys, value.labelValues, value.value)
-    }(collection.breakOut)
+    val childSeries: List[Series] = children
+      .get()
+      .map {
+        case (_, value) => Series(name, labelsKeys, value.labelValues, value.value)
+      }(collection.breakOut)
     val voidSeries = Series(name, labelsKeys, noLabel.labelValues, noLabel.value)
 
     Sample(this, voidSeries :: childSeries)

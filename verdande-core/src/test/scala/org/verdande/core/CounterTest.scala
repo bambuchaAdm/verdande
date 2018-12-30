@@ -6,10 +6,7 @@ class CounterTest extends FlatSpec with Matchers {
   behavior of "Counter"
 
   trait ExampleCounter {
-    val counter: CounterMetric = Counter.build(
-      name = "example_counter",
-      description = "Example counter without registring it anywhere for tests"
-    )
+    val counter: CounterMetric = Counter.build(name = "example_counter", description = "Example counter without registring it anywhere for tests")
 
     def shouldHaveOnlyOneSeries(f: Series => Unit): Unit = {
       val result = counter.collect()
@@ -35,7 +32,7 @@ class CounterTest extends FlatSpec with Matchers {
   }
 
   it should "allow to increment by more then one" in new ExampleCounter {
-    val value  = 10.0
+    val value = 10.0
     counter.inc(value)
     val scrap = counter.collect()
     shouldHaveOnlyOneSeries { series =>
@@ -50,11 +47,7 @@ class CounterTest extends FlatSpec with Matchers {
   }
 
   it should "allow set lables" in {
-    val metric = Counter.build(
-      name = "example_counter",
-      description = "Example counter without registring it anywhere for tests",
-      labelsKeys = List("foo", "bar")
-    )
+    val metric = Counter.build(name = "example_counter", description = "Example counter without registring it anywhere for tests", labelsKeys = List("foo", "bar"))
     val counter = metric.labels("example", "example")
     counter.inc()
     val sample = metric.collect()
@@ -63,22 +56,15 @@ class CounterTest extends FlatSpec with Matchers {
   }
 
   it should "allow register to default registry" in {
-    val metric = Counter.build(
-      name = "example_counter",
-      description = "Example counter without registring it anywhere for tests",
-      labelsKeys = List("foo", "bar")
-    ).register()
-    CollectorRegistry.default should contain (metric)
+    val metric = Counter.build(name = "example_counter", description = "Example counter without registring it anywhere for tests", labelsKeys = List("foo", "bar")).register()
+    CollectorRegistry.default should contain(metric)
   }
 
   it should "allow register in any other registry" in {
     val other = CollectorRegistry()
-    val metric = Counter.build(
-      name = "example_counter",
-      description = "Example counter without registring it anywhere for tests",
-      labelsKeys = List("foo", "bar")
-    ).register()(other)
-    other should contain (metric)
+    val metric =
+      Counter.build(name = "example_counter", description = "Example counter without registring it anywhere for tests", labelsKeys = List("foo", "bar")).register()(other)
+    other should contain(metric)
   }
 
   it should "count exceptions" in new ExampleCounter {

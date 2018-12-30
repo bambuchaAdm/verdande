@@ -10,7 +10,6 @@ class ExampleCollector extends Collector {
 
   override def labelsKeys: List[String] = List.empty
 
-  override def collect(): Sample = {
+  override def collect(): Sample =
     Sample(this, List.empty)
-  }
 }

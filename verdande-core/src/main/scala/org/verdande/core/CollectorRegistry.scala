@@ -11,7 +11,7 @@ trait CollectorRegistry extends Iterable[Collector] {
   def iterator: Iterator[Collector]
 }
 
-object CollectorRegistry  {
+object CollectorRegistry {
   def apply(): CollectorRegistry = new DefaultCollectorRegistry
 
   implicit val default: CollectorRegistry = new DefaultCollectorRegistry
@@ -19,25 +19,23 @@ object CollectorRegistry  {
 
 private[core] class ImmutableRegistry(collectors: ListSet[Collector]) extends Iterable[Collector] {
 
-  def unregister(collector: Collector): ImmutableRegistry = {
+  def unregister(collector: Collector): ImmutableRegistry =
     new ImmutableRegistry(collectors - collector)
-  }
 
-  def register(collector: Collector): ImmutableRegistry = {
+  def register(collector: Collector): ImmutableRegistry =
     new ImmutableRegistry(collectors + collector)
-  }
 
   override def iterator: Iterator[Collector] = collectors.iterator
 }
 
-private[core]final class DefaultCollectorRegistry extends CollectorRegistry {
+private[core] final class DefaultCollectorRegistry extends CollectorRegistry {
   private val ref = new AtomicReference[ImmutableRegistry](new ImmutableRegistry(ListSet.empty))
 
   @tailrec
   override def unregister(collector: Collector): Collector = {
     val prev = ref.get()
     val next = prev.unregister(collector)
-    if(ref.compareAndSet(prev, next)) {
+    if (ref.compareAndSet(prev, next)) {
       collector
     } else {
       unregister(collector)
@@ -47,7 +45,7 @@ private[core]final class DefaultCollectorRegistry extends CollectorRegistry {
   override def register(collector: Collector): Collector = {
     val prev = ref.get()
     val next = prev.register(collector)
-    if(ref.compareAndSet(prev, next)) {
+    if (ref.compareAndSet(prev, next)) {
       collector
     } else {
       register(collector)

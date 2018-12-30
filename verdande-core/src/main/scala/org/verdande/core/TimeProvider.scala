@@ -19,4 +19,3 @@ object TimeProvider {
     override def now: Instant = Instant.now()
   }
 }
-
