@@ -4,7 +4,8 @@ version := "0.1.0-SNAPSHOT"
 
 lazy val commonSettings = Seq(
   scalaVersion := "2.12.8",
-  crossScalaVersions := List("2.11.12", "2.12.8")
+  crossScalaVersions := List("2.11.12", "2.12.8"),
+  parallelExecution in Test := false // https://stackoverflow.com/a/49024536
 )
 
 lazy val core = (project in file("verdande-core"))
