@@ -2,6 +2,10 @@ name := "verdande"
 
 version := "0.1.0-SNAPSHOT"
 
+scalaVersion := "2.12.8"
+
+crossScalaVersions := List("2.11.12", "2.12.8")
+
 lazy val core = project in file("verdande-core")
 
 lazy val jvm = project in file("verdande-jvm")
