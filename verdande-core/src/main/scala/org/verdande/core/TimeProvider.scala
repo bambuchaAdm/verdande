@@ -2,20 +2,32 @@ package org.verdande.core
 
 import java.time.{Duration, Instant}
 
-trait TimeProvider {
+trait TimestampProvider {
+  def timestamp(): Double
+}
 
-  def now: Instant
-
-  def timestamp: Double = now.getEpochSecond
-
-  def durationFrom(point: Instant): Double = {
-    val duration = Duration.between(point, now)
-    duration.getSeconds + (duration.getNano / 1e9)
+object TimestampProvider {
+  implicit val systemTime = new TimestampProvider {
+    override def timestamp: Double = Instant.now().getEpochSecond
   }
 }
 
-object TimeProvider {
-  implicit val systemTime = new TimeProvider {
-    override def now: Instant = Instant.now()
+case class PeriodStart(value: Long) extends AnyVal
+
+trait PeriodProvider {
+  def mark: PeriodStart
+
+  def durationFrom(startPoint: PeriodStart): Double = {
+    val finishPoint = System.nanoTime()
+    (finishPoint - startPoint.value).toDouble / 1e9
+  }
+}
+
+object PeriodProvider {
+  /**
+    * System time provider is accurate to one milisecond
+    */
+  implicit val nanosecondPeriodProvider = new PeriodProvider {
+    override def mark: PeriodStart = PeriodStart(System.nanoTime())
   }
 }

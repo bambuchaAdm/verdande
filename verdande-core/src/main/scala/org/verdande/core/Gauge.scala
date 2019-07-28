@@ -15,18 +15,27 @@ trait Gauge {
 
   def set(value: Double): Unit
 
-  def setToCurrentTime()(implicit timeProvider: TimeProvider): Unit =
-    set(timeProvider.timestamp)
+  /**
+    * Set gauge to current time - resolution determinate by time provider
+    */
+  def setToCurrentTime()(implicit time: TimestampProvider): Unit =
+    set(time.timestamp())
 
-  def time[A](f: => A)(implicit timeProvider: TimeProvider) = {
-    val start = timeProvider.now
+  /**
+    * Track execution time of provided function - maximum resolution determinate by time provider
+    */
+  def time[A](f: => A)(implicit time: PeriodProvider): A = {
+    val start = time.mark
     try {
       f
     } finally {
-      set(timeProvider.durationFrom(start))
+      set(time.durationFrom(start))
     }
   }
 
+  /**
+    * Track number of concurrent running type of task
+    */
   def track[A](f: => A): A = {
     inc()
     try {

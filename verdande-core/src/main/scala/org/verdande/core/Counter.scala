@@ -6,8 +6,9 @@ import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
 trait Counter {
-  def inc()
-  def inc(value: Double)
+  def inc(): Unit
+
+  def inc(value: Double): Unit
 
   def countExceptions[A](exceptions: Class[_ <: Throwable]*)(f: => A): A =
     try {
@@ -20,7 +21,7 @@ trait Counter {
 }
 
 private[core] class CounterChild(val labelValues: List[String]) extends Counter {
-  val buffer = new DoubleAdder()
+  private val buffer = new DoubleAdder()
 
   override def inc(): Unit = buffer.add(1.0)
 
@@ -61,11 +62,10 @@ final case class CounterMetric(name: String, description: String, labelsKeys: Li
   }
 
   override def collect(): Sample = {
-    val childSeries: List[Series] = children
-      .get()
-      .map {
-        case (_, value) => Series(name, labelsKeys, value.labelValues, value.value)
-      }(collection.breakOut)
+    val childrenNow = children.get()
+    val childSeries: List[Series] = childrenNow.map {
+      case (_, value) => Series(name, labelsKeys, value.labelValues, value.value)
+    }(collection.breakOut)
     val voidSeries = Series(name, labelsKeys, noLabel.labelValues, noLabel.value)
 
     Sample(this, voidSeries :: childSeries)

@@ -26,9 +26,20 @@ lazy val akka = (project in file("verdande-akka"))
 lazy val akkaHttp = (project in file("verdande-akka-http"))
   .settings(commonSettings)
 
+lazy val docs = (project in file("docs"))
+  .dependsOn(core)
+
+
 lazy val root = (project in file("."))
   .settings(
     commonSettings,
-    (scalafmtConfig in ThisBuild) := Some(baseDirectory.value / "project" / "scalafmt.conf")
-  )
-  .aggregate(core, jvm, pushgateway, play, akka, akkaHttp)
+    (scalafmtConfig in ThisBuild) := Some(baseDirectory.value / "project" / "scalafmt.conf"),
+    micrositeName := "Verdande",
+    micrositeDescription := "Scala instrumentation library in Prometheus.io style",
+    micrositeUrl := "http://localhost:4000",
+    micrositeBaseUrl := "/",
+    micrositeCompilingDocsTool := WithMdoc
+  ).aggregate(core, jvm, pushgateway, play, akka, akkaHttp)
+  .dependsOn(core)
+  .enablePlugins(MicrositesPlugin)
+

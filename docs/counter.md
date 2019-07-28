@@ -8,7 +8,7 @@ Counter is monotonically growing only type of metric. Best for measure:
 ## Example usage
 
 
-```scala modc
+```scala mdoc:silent
 import org.verdande.core.Counter
 
 class SomeService {
@@ -51,11 +51,13 @@ Second take map from label name to label value and internally create sequence wi
 ### Example
 
 
-```scala mdoc
+```scala mdoc:silent
 import org.verdande.core.Counter
 
-class SomeConnetor {
-  import SomeConnector._
+class SomeConnetor2 {
+  import SomeConnector2._
+  
+  def makeRequest(): { def code: Int } = ???
   
   def foo() = {
     val response = makeRequest()
@@ -63,10 +65,10 @@ class SomeConnetor {
   }
 }
 
-object SomeConnector {
-  val responses = Counter(
-    name = "http.response"
-    description = "Total number of response in HTTP comunication"
+object SomeConnector2 {
+  val responses = Counter.build(
+    name = "http.response",
+    description = "Total number of response in HTTP comunication",
     labelsKeys = List("code")
   ).register()
 }
@@ -77,26 +79,28 @@ object SomeConnector {
 For host paths calling for child counter could be expensive operation.
 Child counter could be assigned to local variable for omit lookup in child collection.
 
-```
+```scala mdoc:silent
 import org.verdande.core.Counter
 
-class SomeConnetor(family: String) {
-  import SomeConnector._
+class SomeConnetor3(family: String) {
+  import SomeConnector3._
   
-  private val localResponses = responses.labels(family) 
+  private val localResponses = responses.labels(family)
+  
+  def makeRequest() = ??? 
   
   def foo() = {
-    Range(1,10).foreach {
-        val response = makeRequest()
-        localResponses.inc()
+    Range(1,10).foreach { _ =>  
+      val response = makeRequest()
+      localResponses.inc()
     }
   }
 }
 
-object SomeConnector {
-  val responses = Counter(
-    name = "http.response"
-    description = "Total number of response in HTTP comunication"
+object SomeConnector3 {
+  val responses = Counter.build(
+    name = "http.response",
+    description = "Total number of response in HTTP comunication",
     labelsKeys = List("family")
   ).register()
 }

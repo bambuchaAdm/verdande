@@ -7,12 +7,12 @@ import scala.annotation.tailrec
 trait Histogram {
   def observe(value: Double): Unit
 
-  def time[A](f: => A)(implicit timeProvider: TimeProvider): A = {
-    val now = timeProvider.now
+  def time[A](f: => A)(implicit time: PeriodProvider): A = {
+    val begining = time.mark
     try {
       f
     } finally {
-      observe(timeProvider.durationFrom(now))
+      observe(time.durationFrom(begining))
     }
   }
 }
